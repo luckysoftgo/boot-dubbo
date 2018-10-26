@@ -1,0 +1,99 @@
+#springboot配置.
+spring:
+  application:
+    name: springboot-dubbo-provider
+server:
+  port: 9090
+  #contextPath: dubbo
+
+#dubbo配置
+dubbo:
+  scan:
+    basePackages: com.application.base.dubbo.provider.service  #配置dubbo的包扫描，针对dubbo的@Service, @Reference注解
+  application:
+    id: springboot-dubbo-provider
+    name: springboot-dubbo-provider
+    owner: bruce
+    logger: slf4j #使用 slf4j 打印日志.
+  registry:
+    id: zk-yml-registry
+    address: zookeeper://118.24.157.96:2181
+  protocol:
+    id: dubbo
+    name: dubbo
+    port: 20880
+    serialization: kryo
+
+management:
+  server:
+      port: 9091
+  endpoints:
+    dubbo:
+      enabled: true
+  health:
+    dubbo:
+      status:
+        defaults: memory
+        extras: load,threadpool
+
+#日志级别配置
+logging:
+  level:
+    com.application.base.dubbo.provider: debug
+
+
+
+############################################################################ 多数据源的配置 #######################################################################################################
+
+spring:
+    datasource:
+        name: mysql_test
+        master:
+          #基本属性--注意，这里的为【jdbcurl】-- 默认使用HikariPool作为数据库连接池
+          jdbcurl: jdbc:mysql://127.0.0.1:3306/mytest?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true
+          username: root
+          password: root
+          driver-class-name: com.mysql.jdbc.Driver
+        slave:
+          #基本属性--注意，这里为 【url】-- 使用 druid 作为数据库连接池
+          url: jdbc:mysql://118.25.36.41:3306/mytest?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true
+          username: root
+          password: root
+          driver-class-name: com.mysql.jdbc.Driver
+        read: get,select,count,list,query,find
+        write: add,create,update,delete,remove,insert
+        #druid相关配置
+        druid:
+          #监控统计拦截的filters
+          filters: stat,wall
+          #配置初始化大小/最小/最大
+          initial-size: 1
+          min-idle: 1
+          max-active: 20
+          #获取连接等待超时时间
+          max-wait: 60000
+          #间隔多久进行一次检测，检测需要关闭的空闲连接
+          time-between-eviction-runs-millis: 60000
+          #一个连接在池中最小生存的时间
+          min-evictable-idle-time-millis: 300000
+          validation-query: SELECT 'x'
+          test-while-idle: true
+          test-on-borrow: false
+          test-on-return: false
+          #打开PSCache，并指定每个连接上PSCache的大小。oracle设为true，mysql设为false。分库分表较多推荐设置为false
+          pool-prepared-statements: false
+          max-pool-prepared-statement-per-connection-size: 20
+
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.winterchen.model
+
+
+#pagehelper
+pagehelper:
+    helperDialect: mysql
+    reasonable: true
+    supportMethodsArguments: true
+    params: count=countSql
+    returnPageInfo: check

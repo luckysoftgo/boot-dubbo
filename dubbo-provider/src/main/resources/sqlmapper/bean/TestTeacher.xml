@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.application.base.dubbo.provider.dao.TestTeacherMapper">
+
+	<!-- 输出列 -->
+	<sql id="baseColumnList">
+		u.id as id ,
+		u.disabled as disabled ,
+		u.uuid as uuid ,
+		u.info_desc as infoDesc ,
+		u.create_user as createUser ,
+		u.create_time as createTime ,
+		u.update_user as updateUser ,
+		u.update_time as updateTime ,
+		u.name as name ,
+		u.mobile as mobile ,
+		u.gender as gender ,
+		u.age as age ,
+		u.major as major ,
+		u.score as score 
+	</sql>
+	
+	
+	<!-- 查询的列 -->
+	<sql id="searchCriteria">
+        <include refid="Util.baseSelect" />
+		<if test="name != null and name != ''">
+		and u.name = #{name,jdbcType=VARCHAR}
+		</if>
+		<if test="nameLike != null and nameLike != ''">
+		and u.name like CONCAT('%',#{nameLike,jdbcType=VARCHAR},'%') 
+		</if>
+		<if test="mobile != null and mobile != ''">
+		and u.mobile = #{mobile,jdbcType=VARCHAR}
+		</if>
+		<if test="mobileLike != null and mobileLike != ''">
+		and u.mobile like CONCAT('%',#{mobileLike,jdbcType=VARCHAR},'%') 
+		</if>
+		<if test="gender != null and gender !=-1  ">
+		and u.gender = #{gender,jdbcType=NUMERIC}
+		</if>
+		<if test="age != null and age !=-1  ">
+		and u.age = #{age,jdbcType=NUMERIC}
+		</if>
+		<if test="major != null and major != ''">
+		and u.major = #{major,jdbcType=VARCHAR}
+		</if>
+		<if test="majorLike != null and majorLike != ''">
+		and u.major like CONCAT('%',#{majorLike,jdbcType=VARCHAR},'%') 
+		</if>
+		<if test="score != null and score !=-1 ">
+		and u.score = #{score,jdbcType=DOUBLE}
+		</if>
+	</sql>
+
+    <!-- 修改条件 -->
+    <sql id="updateColumnWhere">
+        <set>
+            u.create_time = #{createTime,jdbcType=TIMESTAMP}
+            <if test="disabled != null and disabled !=-1 ">
+            , u.disabled = #{disabled,jdbcType=NUMERIC}
+            </if>
+            <if test="infoDesc != null and infoDesc != ''">
+            , u.info_desc = #{infoDesc,jdbcType=VARCHAR}
+            </if>
+            <if test="updateUser != null and updateUser != ''">
+            , u.update_user = #{updateUser,jdbcType=VARCHAR}
+            </if>
+            <if test="updateTime != null ">
+            , u.update_time = #{updateTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="name != null and name != ''">
+            , u.name = #{name,jdbcType=VARCHAR}
+            </if>
+            <if test="mobile != null and mobile != ''">
+            , u.mobile = #{mobile,jdbcType=VARCHAR}
+            </if>
+            <if test="gender != null and gender !=-1 ">
+            , u.gender = #{gender,jdbcType=NUMERIC}
+            </if>
+            <if test="age != null and age !=-1 ">
+            , u.age = #{age,jdbcType=NUMERIC}
+            </if>
+            <if test="major != null and major != ''">
+            , u.major = #{major,jdbcType=VARCHAR}
+            </if>
+            <if test="score != null and score !=-1 ">
+            , u.score = #{score,jdbcType=DOUBLE}
+            </if>
+        </set>
+    </sql>
+
+
+    <!-- 保存对象 -->
+    <insert id="saveTestTeacher" parameterType="com.application.base.dubbo.module.entity.TestTeacher" >
+        insert into test_teacher (
+			disabled,
+			uuid,
+			info_desc,
+			create_user,
+			create_time,
+			update_user,
+			update_time,
+			name,
+			mobile,
+			gender,
+			age,
+			major,
+			score
+        ) values (
+			#{disabled,jdbcType=NUMERIC},
+			#{uuid,jdbcType=VARCHAR},
+			#{infoDesc,jdbcType=VARCHAR},
+			#{createUser,jdbcType=VARCHAR},
+			#{createTime,jdbcType=TIMESTAMP},
+			#{updateUser,jdbcType=VARCHAR},
+			#{updateTime,jdbcType=TIMESTAMP},
+			#{name,jdbcType=VARCHAR},
+			#{mobile,jdbcType=VARCHAR},
+			#{gender,jdbcType=NUMERIC},
+			#{age,jdbcType=NUMERIC},
+			#{major,jdbcType=VARCHAR},
+			#{score,jdbcType=DOUBLE}
+        )
+    </insert>
+
+    <!-- 批量保存对象 -->
+    <insert id="saveTestTeachers" parameterType="java.util.ArrayList" >
+        insert into test_teacher (
+			disabled,
+			uuid,
+			info_desc,
+			create_user,
+			create_time,
+			update_user,
+			update_time,
+			name,
+			mobile,
+			gender,
+			age,
+			major,
+			score
+        ) values
+        <foreach collection="list" item="item" index="index" separator=",">
+        (
+			#{item.disabled,jdbcType=NUMERIC},
+			#{item.uuid,jdbcType=VARCHAR},
+			#{item.infoDesc,jdbcType=VARCHAR},
+			#{item.createUser,jdbcType=VARCHAR},
+			#{item.createTime,jdbcType=TIMESTAMP},
+			#{item.updateUser,jdbcType=VARCHAR},
+			#{item.updateTime,jdbcType=TIMESTAMP},
+			#{item.name,jdbcType=VARCHAR},
+			#{item.mobile,jdbcType=VARCHAR},
+			#{item.gender,jdbcType=NUMERIC},
+			#{item.age,jdbcType=NUMERIC},
+			#{item.major,jdbcType=VARCHAR},
+			#{item.score,jdbcType=DOUBLE}
+        )
+        </foreach>
+    </insert>
+
+
+    <!-- 修改 -->
+    <update id="updateTestTeacher" parameterType="com.application.base.dubbo.module.entity.TestTeacher">
+        update test_teacher u
+        	<include refid="updateColumnWhere" />
+        where
+        	u.id = #{id,jdbcType=NUMERIC}
+    </update>
+
+    <!-- 逻辑删除 -->
+    <update id="deleteTestTeacher" parameterType="com.application.base.dubbo.module.entity.TestTeacher">
+        update test_teacher u set u.disabled = 1
+        	<if test="updateTime != null ">
+            ,u.update_time = #{updateTime,jdbcType=TIMESTAMP}
+        	</if>
+        	<if test="updateUser != null and updateUser != ''">
+            ,u.update_user = #{updateUser,jdbcType=VARCHAR}
+        	</if>
+        where
+        	<if test="id != null and id != '' ">
+            u.id = #{id,jdbcType=NUMERIC}
+        	</if>
+    </update>
+
+    <!-- 查询一条数据 -->
+    <select id="queryTestTeacher" parameterType="java.util.Map" resultType="com.application.base.dubbo.module.entity.TestTeacher">
+        select
+        	<include refid="baseColumnList" />
+        from
+			test_teacher u
+        where
+        	u.disabled = 0
+        <include refid="searchCriteria" />
+    </select>
+
+    <!-- 查询所有列表数据 -->
+    <select id="queryTestTeachers" parameterType="java.util.Map" resultType="com.application.base.dubbo.module.entity.TestTeacher">
+        select
+        	<include refid="baseColumnList" />
+        from
+			test_teacher u
+        where
+        	u.disabled = 0
+        <include refid="searchCriteria" />
+        <include refid="Util.orderCriteria" />
+    </select>
+
+    <!-- 查询分页列表数据 -->
+    <select id="queryPageTestTeachers" parameterType="java.util.Map" resultType="com.application.base.dubbo.module.entity.TestTeacher">
+        select
+        	<include refid="baseColumnList" />
+        from
+			test_teacher u
+        where
+        	u.disabled = 0
+        <include refid="searchCriteria" />
+        <include refid="Util.orderCriteria" />
+        <include refid="Util.mysqlPage" />
+    </select>
+
+    <!-- 查询总数 -->
+    <select id="totalCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select
+        	count(u.id)
+        from
+			test_teacher u
+        where
+        	u.disabled = 0
+        <include refid="searchCriteria" />
+    </select>
+
+</mapper>

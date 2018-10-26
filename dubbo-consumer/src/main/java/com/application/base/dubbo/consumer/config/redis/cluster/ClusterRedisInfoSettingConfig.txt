@@ -1,0 +1,153 @@
+package com.javabase.demo.config.redis.cluster;
+
+import com.application.boot.cache.redis.jedis.factory.JedisClusterFactory;
+import com.application.boot.cache.redis.jedis.factory.JedisClusterSessionFactory;
+import com.application.boot.cache.redis.jedis.factory.JedisSimpleSessionFactory;
+import com.application.boot.cache.redis.jedis.lock.DelegateDistributedLock;
+import com.application.boot.utils.common.BaseStringUtil;
+import com.javabase.demo.config.redis.RedisCommonPoolConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.JedisSentinelPool;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * @desc redis 集群管理.
+ * @author 孤狼
+ */
+@Configuration
+@EnableAutoConfiguration
+@ConfigurationProperties(prefix = "redis.cluster", ignoreUnknownFields = false)
+@PropertySource("classpath:properties/redis.properties")
+public class ClusterRedisInfoSettingConfig {
+	
+	/**
+	 * 集群的ip集合:192.168.1.1:16339;192.168.1.2:16339;
+	 */
+	private String hostinfos="";
+	/**
+	 * 失效时间：秒
+ 	 */
+	private int timeout=50000;
+	
+	/**
+	 * 失效时间：秒
+	 */
+	private int sotimeout=50000;
+	
+	/**
+	 * 最大匹配数
+	 */
+	private int maxattempts=50000;
+	/**
+	 * 密码.
+	 */
+	private String password="";
+	
+	/**
+	 * 获得 JedisPoolConfig 的信息.
+	 * @return
+	 */
+	@Autowired
+	private RedisCommonPoolConfig commonPoolConfig;
+	
+	/**
+	 *  初始化 JedisSentinelPool 的实例.
+	 * @return
+	 */
+	@Bean(name = "redisJedisClusterFactory")
+	public JedisClusterFactory getRedisJedisClusterFactory(){
+		JedisClusterFactory clusterFactory = null;
+		if (commonPoolConfig==null){
+			return clusterFactory;
+		}
+		JedisPoolConfig config = commonPoolConfig.getJedisPoolConfig();
+		if (config!=null){
+			if (BaseStringUtil.isNotEmpty(password)){
+				clusterFactory = new JedisClusterFactory(config,timeout, sotimeout, maxattempts, password, hostinfos);
+			}else{
+				clusterFactory = new JedisClusterFactory(config,timeout, sotimeout, maxattempts, hostinfos);
+			}
+		}
+		return clusterFactory;
+	}
+	
+	/**
+	 * 获得 Redis 的实例.
+	 * @return
+	 */
+	@Bean(name = "redisJedisClusterSessionFactory")
+	public JedisClusterSessionFactory getRedisJedisClusterSessionFactory(){
+		JedisClusterFactory  clusterFactory = getRedisJedisClusterFactory();
+		JedisClusterSessionFactory sessionFactory = null;
+		if (clusterFactory!=null){
+			sessionFactory = new JedisClusterSessionFactory();
+			sessionFactory.setPool(clusterFactory);
+		}
+		return sessionFactory;
+	}
+	
+	/**
+	 * 获得 Redis 分布式锁
+	 * @return
+	 */
+	@Bean(name = "redisClusterDistributedLock")
+	public DelegateDistributedLock getRedisClusterDistributedLock(){
+		JedisClusterSessionFactory factory = getRedisJedisClusterSessionFactory();
+		if (factory!=null){
+			DelegateDistributedLock distributedLock = new DelegateDistributedLock();
+			distributedLock.setFactory(factory);
+			return distributedLock;
+		}else{
+			return null;
+		}
+	}
+	
+	public String getHostinfos() {
+		return hostinfos;
+	}
+	
+	public void setHostinfos(String hostinfos) {
+		this.hostinfos = hostinfos;
+	}
+	
+	public int getTimeout() {
+		return timeout;
+	}
+	
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
+	}
+	
+	public int getSotimeout() {
+		return sotimeout;
+	}
+	
+	public void setSotimeout(int sotimeout) {
+		this.sotimeout = sotimeout;
+	}
+	
+	public int getMaxattempts() {
+		return maxattempts;
+	}
+	
+	public void setMaxattempts(int maxattempts) {
+		this.maxattempts = maxattempts;
+	}
+	
+	public String getPassword() {
+		return password;
+	}
+	
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+}

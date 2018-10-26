@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<artifactId>boot-dubbo</artifactId>
+		<groupId>com.application.base</groupId>
+		<version>1.0.0-RELEASE</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.application.base</groupId>
+	<artifactId>dubbo-consumer</artifactId>
+	<packaging>jar</packaging>
+	<name>dubbo-consumer</name>
+	<description>dubbo project for spring boot : dubbo-consumer </description>
+
+	<!-- 项目属性配置. -->
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+		<pagehelper-boot.version>1.2.5</pagehelper-boot.version>
+		<pagehelper.version>5.1.4</pagehelper.version>
+
+		<dubbo-spring-boot-starter.version>0.2.0</dubbo-spring-boot-starter.version>
+		<zookeeper.version>3.4.10</zookeeper.version>
+		<lombok.version>1.18.0</lombok.version>
+		<base-xxxx.version>1.0.0-RELEASE</base-xxxx.version>
+		<servlet-api>4.0.0</servlet-api>
+		<swagger2.version>2.7.0</swagger2.version>
+
+		<downloadSources>true</downloadSources>
+	</properties>
+
+	<dependencies>
+		<!--自己的jar-->
+		<dependency>
+			<groupId>com.application.base</groupId>
+			<artifactId>dubbo-api</artifactId>
+			<version>1.0.0-RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>com.application.base</groupId>
+			<artifactId>base-cache</artifactId>
+			<version>${base-xxxx.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.application.base</groupId>
+			<artifactId>base-boot</artifactId>
+			<version>${base-xxxx.version}</version>
+		</dependency>
+
+		<!-- Spring Boot dependencies -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<version>${springboot.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+			<version>${springboot.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba.boot</groupId>
+			<artifactId>dubbo-spring-boot-starter</artifactId>
+			<version>${dubbo-spring-boot-starter.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba.boot</groupId>
+			<artifactId>dubbo-spring-boot-actuator</artifactId>
+			<version>${dubbo-spring-boot-starter.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>dubbo-serialization-kryo</artifactId>
+			<version>${dubbo.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>${lombok.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>${swagger2.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>${swagger2.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<version>2.1</version>
+		</dependency>
+
+		<!-- 分页插件 -->
+		<dependency>
+			<groupId>com.github.pagehelper</groupId>
+			<artifactId>pagehelper-spring-boot-autoconfigure</artifactId>
+			<version>${pagehelper-boot.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.pagehelper</groupId>
+			<artifactId>pagehelper-spring-boot-starter</artifactId>
+			<version>${pagehelper-boot.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.pagehelper</groupId>
+			<artifactId>pagehelper</artifactId>
+			<version>${pagehelper.version}</version>
+		</dependency>
+
+	</dependencies>
+
+</project>

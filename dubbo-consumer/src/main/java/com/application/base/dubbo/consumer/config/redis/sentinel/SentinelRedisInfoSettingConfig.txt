@@ -1,0 +1,148 @@
+package com.javabase.demo.config.redis.sentinel;
+
+import com.application.boot.cache.redis.jedis.factory.JedisSimpleSessionFactory;
+import com.application.boot.cache.redis.jedis.lock.DelegateDistributedLock;
+import com.application.boot.utils.common.PropStringUtils;
+import com.javabase.demo.config.redis.RedisCommonPoolConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.JedisSentinelPool;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * @desc redis 哨兵管理.
+ * @author 孤狼
+ */
+@Configuration
+@EnableAutoConfiguration
+@ConfigurationProperties(prefix = "redis.sentinel", ignoreUnknownFields = false)
+@PropertySource("classpath:properties/redis.properties")
+public class SentinelRedisInfoSettingConfig {
+	
+	/**
+	 * 哨兵名称
+	 */
+	private String masterName="brucespringboot";
+	/**
+	 * 连接主机:
+	 * redis.sentinel.sentinel.A = 192.168.1.1:6379
+	 * redis.sentinel.sentinel.B = 192.168.1.2:6379
+	 *
+	 */
+	private Set<String> sentinels;
+	
+	/**
+	 * 可能配置的哨兵.
+	 */
+	String[] chars = new String[]{"A","B","C","D","E","F","G","H","I","J","K","L","M","N"};
+	
+	/**
+	 * 失效时间：秒
+ 	 */
+	private int timeout=50000;
+	/**
+	 * 获得 JedisPoolConfig 的信息.
+	 * @return
+	 */
+	@Autowired
+	private RedisCommonPoolConfig commonPoolConfig;
+	
+	/**
+	 *  初始化 JedisSentinelPool 的实例.
+	 * @return
+	 */
+	@Bean(name = "jedisPool")
+	public JedisSentinelPool getRedisJedisSentinelPool(){
+		JedisSentinelPool sentinelPool = null;
+		if (commonPoolConfig==null){
+			return sentinelPool;
+		}
+		Set<String> tmpSentinels = new HashSet<>();
+		JedisPoolConfig config = commonPoolConfig.getJedisPoolConfig();
+		if (config!=null){
+			for (int i = 0; i < chars.length ; i++) {
+				Map<String,Object>  resultMap = getFileProps();
+				String instance = "redis.sentinel.sentinel."+chars[i];
+				if (resultMap.containsKey(instance)){
+					tmpSentinels.add(resultMap.get(instance).toString());
+				}
+			}
+			sentinels = tmpSentinels;
+			if (tmpSentinels.size()>0){
+				sentinelPool = new JedisSentinelPool(masterName,sentinels,config,timeout);
+			}
+		}
+		return sentinelPool;
+	}
+	
+	/**
+	 * 获得配置文件信息.
+	 * @return
+	 */
+	private Map<String,Object> getFileProps(){
+		return PropStringUtils.getValues("/properties/redis.properties");
+	}
+	
+	/**
+	 * 获得 Redis 的实例.
+	 * @return
+	 */
+	@Bean(name = "sessionFactory")
+	public JedisSimpleSessionFactory getRedisSentinelSessionFactory(){
+		JedisSentinelPool sentinelPool = getRedisJedisSentinelPool();
+		JedisSimpleSessionFactory factory = null;
+		if (sentinelPool!=null){
+			factory = new JedisSimpleSessionFactory();
+			factory.setPool(sentinelPool);
+		}
+		return factory;
+	}
+	
+	/**
+	 * 获得 Redis 分布式锁
+	 * @return
+	 */
+	@Bean(name = "distributedLock")
+	public DelegateDistributedLock getRedisSentinelDistributedLock(){
+		JedisSimpleSessionFactory factory = getRedisSentinelSessionFactory();
+		if (factory!=null){
+			DelegateDistributedLock distributedLock = new DelegateDistributedLock();
+			distributedLock.setFactory(factory);
+			return distributedLock;
+		}else{
+			return null;
+		}
+	}
+	
+	public String getMasterName() {
+		return masterName;
+	}
+	
+	public void setMasterName(String masterName) {
+		this.masterName = masterName;
+	}
+	
+	public Set<String> getSentinels() {
+		return sentinels;
+	}
+	
+	public void setSentinels(Set<String> sentinels) {
+		this.sentinels = sentinels;
+	}
+	
+	public int getTimeout() {
+		return timeout;
+	}
+	
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
+	}
+}

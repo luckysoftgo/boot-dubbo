@@ -1,0 +1,29 @@
+#springboot配置.
+spring:
+  application:
+    name: springboot-dubbo-consumer
+server:
+  port: 8081
+management:
+  server:
+    port: 8082
+
+#dubbo配置
+dubbo:
+  application:
+    id: springboot-dubbo-consumer
+    name: springboot-dubbo-consumer
+    owner: bruce
+    logger: slf4j #使用 slf4j 打印日志.
+  consumer:
+    check: false
+
+  #服务注册配置
+  registry:
+      id: zk-yml-registry
+      address: zookeeper://118.24.157.96:2181
+
+#日志级别配置
+logging:
+  level:
+    com.application.base.dubbo.consumer: debug
